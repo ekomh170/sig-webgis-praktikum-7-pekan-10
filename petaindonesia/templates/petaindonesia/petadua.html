@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ judul }}</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <style>
+        body { margin: 0; font-family: system-ui, sans-serif; }
+        header { box-sizing: border-box; height: 44px; display: flex; align-items: center;
+                 padding: 0 16px; background: #1f4e79; color: #fff; }
+        header h1 { margin: 0; font-size: 20px; }
+        #map { height: calc(100vh - 44px); width: 100%; }
+
+        /* Panel pilih kota */
+        .panel-kota { background: #fff; padding: 8px 10px; border-radius: 6px;
+                      box-shadow: 0 1px 5px rgba(0,0,0,.35); min-width: 130px; }
+        .panel-kota h4 { margin: 0 0 6px; font-size: 13px; }
+        .panel-kota button { display: block; width: 100%; margin: 3px 0; padding: 4px 8px;
+                             font-size: 12px; text-align: left; cursor: pointer;
+                             background: #f3f6fa; border: 1px solid #cfd8e3; border-radius: 4px; }
+        .panel-kota button:hover, .panel-kota button.aktif { background: #1f4e79; color: #fff; }
+
+        /* Label nama kota yang selalu tampil */
+        .label-kota { font-weight: 600; font-size: 12px; }
+    </style>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body>
+    <header><h1>{{ judul }}</h1></header>
+    <div id="map"></div>
+
+    {# Data kota dari view dikirim aman sebagai JSON #}
+    {{ kota|json_script:"data-kota" }}
+
+    <script>
+        const dataKota = JSON.parse(document.getElementById("data-kota").textContent);
+
+        // 1. Peta dan basemap
+        const map = L.map("map");
+        const osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        const satelit = L.tileLayer(
+            "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+            { maxZoom: 19, attribution: "Tiles &copy; Esri" }
+        );
+
+        // 2. Marker setiap kota: label permanen + popup data non-spasial
+        const fmt = (n) => n.toLocaleString("id-ID");
+        const grupKota = L.featureGroup().addTo(map);
+        const markerKota = {};
+        dataKota.forEach((k) => {
+            const m = L.marker([k.lat, k.lon])
+                .bindTooltip(k.nama, { permanent: true, direction: "right",
+                                       offset: [10, -18], className: "label-kota" })
+                .bindPopup(
+                    `<b>${k.nama}</b><br>${k.keterangan}<br>` +
+                    `Populasi: ${fmt(k.populasi)} jiwa<br>` +
+                    `Luas: ${fmt(k.luas)} km&sup2;<br>` +
+                    `Kepadatan: ${fmt(k.kepadatan)} jiwa/km&sup2;<br>` +
+                    `<small>Lat ${k.lat}, Lon ${k.lon}</small>`
+                )
+                .addTo(grupKota);
+            // label disembunyikan saat popup terbuka agar tidak tertutup
+            m.on("popupopen", () => m.closeTooltip());
+            m.on("popupclose", () => m.openTooltip());
+            markerKota[k.nama] = m;
+        });
+
+        // 3. Tampilan awal: seluruh kota terlihat
+        const tampilkanSemua = () => map.fitBounds(grupKota.getBounds(), { padding: [50, 50] });
+        tampilkanSemua();
+
+        // 4. Panel "Pilih kota" sebagai kontrol Leaflet
+        const PanelKota = L.Control.extend({
+            options: { position: "topright" },
+            onAdd: function () {
+                const div = L.DomUtil.create("div", "panel-kota");
+                div.innerHTML = "<h4>Pilih kota</h4>";
+                const tombol = [];
+                const tambahTombol = (teks, aksi) => {
+                    const b = L.DomUtil.create("button", "", div);
+                    b.textContent = teks;
+                    b.onclick = () => {
+                        tombol.forEach((t) => t.classList.remove("aktif"));
+                        b.classList.add("aktif");
+                        aksi();
+                    };
+                    tombol.push(b);
+                };
+                dataKota.forEach((k) => tambahTombol(k.nama, () => {
+                    map.flyTo([k.lat, k.lon], 13);
+                    markerKota[k.nama].openPopup();
+                }));
+                tambahTombol("Tampilkan semua", () => { map.closePopup(); tampilkanSemua(); });
+                // klik di panel tidak ikut menggeser/zoom peta
+                L.DomEvent.disableClickPropagation(div);
+                return div;
+            }
+        });
+
+        // 5. Kontrol layer, panel kota, dan skala
+        L.control.layers(
+            { "OpenStreetMap": osm, "Citra Satelit": satelit },
+            { "Kota Jabodetabek": grupKota }
+        ).addTo(map);
+        new PanelKota().addTo(map);
+        L.control.scale({ imperial: false }).addTo(map);
+    </script>
+</body>
+</html>
