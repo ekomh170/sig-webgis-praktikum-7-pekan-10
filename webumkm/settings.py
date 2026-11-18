@@ -127,3 +127,10 @@ MAILERS = {
     },
 }
 
+
+# --- Pengaturan WebGIS ---------------------------------------------------
+
+# Default Django adalah "same-origin": browser tidak mengirim header Referer
+# ke server lain, sehingga tile OpenStreetMap menolak permintaan (HTTP 403).
+# Nilai ini mengirim origin (http://localhost:8000) ke server lintas origin.
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
