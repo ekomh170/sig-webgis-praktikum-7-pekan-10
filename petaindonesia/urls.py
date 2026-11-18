@@ -1,6 +1,7 @@
 from django.urls import path
-from . import views
+from . import views, view_peta
 
 urlpatterns = [
     path('welcome/', views.welcome, name='welcome'),
+    path('petasatu/', view_peta.petasatu, name='petasatu'),
 ]
