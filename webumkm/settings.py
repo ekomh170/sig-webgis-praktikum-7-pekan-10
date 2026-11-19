@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "petaindonesia",
+    "gempabumi",
 ]
 
 MIDDLEWARE = [
@@ -134,3 +136,10 @@ MAILERS = {
 # ke server lain, sehingga tile OpenStreetMap menolak permintaan (HTTP 403).
 # Nilai ini mengirim origin (http://localhost:8000) ke server lintas origin.
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
+# Sumber data gempa terkini BMKG (15 gempa M 5.0+). Dapat diganti lewat
+# environment variable BMKG_GEMPA_URL, misalnya untuk pengujian offline.
+BMKG_GEMPA_URL = os.environ.get(
+    "BMKG_GEMPA_URL",
+    "https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json",
+)
