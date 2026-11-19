@@ -35,3 +35,13 @@ python manage.py test
 ```
 
 Data gempa: BMKG, https://data.bmkg.go.id/gempabumi/ (wajib mencantumkan BMKG sebagai sumber data).
+
+## Dukung Proyek Ini
+
+Kalau repository ini membantu belajarmu, kamu bisa mendukung lewat GitHub Sponsors:
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/ekomh170)
+
+Memberi ⭐ pada repository ini juga sudah sangat membantu.
+
+> **Catatan:** Dibuat oleh **Eko Muchamad Haryono** ([@ekomh170](https://github.com/ekomh170)) untuk Praktikum 7 mata kuliah Sistem Informasi Geografis, STT Terpadu Nurul Fikri. Silakan dipakai sebagai referensi belajar dan cantumkan nama pembuat bila menyalin sebagian kode.
