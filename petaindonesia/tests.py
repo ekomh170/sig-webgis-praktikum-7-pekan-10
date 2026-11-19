@@ -2,6 +2,12 @@ from django.test import TestCase
 
 
 class HalamanPetaTest(TestCase):
+    def test_beranda_menautkan_semua_halaman(self):
+        resp = self.client.get("/")
+        self.assertTemplateUsed(resp, "petaindonesia/beranda.html")
+        for url in ["/welcome/", "/petasatu/", "/petadua/", "/gempabumi/", "/gempabumi/api/"]:
+            self.assertContains(resp, f'href="{url}"')
+
     def test_welcome(self):
         resp = self.client.get("/welcome/")
         self.assertContains(resp, "Selamat Datang di Situs Kami !")
