@@ -5,6 +5,7 @@ Project `webumkm` berisi dua app: `petaindonesia` dan `gempabumi`.
 
 | URL               | App           | Isi                                                         |
 | ----------------- | ------------- | ----------------------------------------------------------- |
+| `/`               | petaindonesia | Beranda: daftar semua halaman                               |
 | `/welcome/`       | petaindonesia | Teks sambutan (HttpResponse)                                |
 | `/petasatu/`      | petaindonesia | Peta Indonesia + marker Jakarta                             |
 | `/petadua/`       | petaindonesia | Latihan Mandiri 1: peta Jabodetabek dengan panel pilih kota |
